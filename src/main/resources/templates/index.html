@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0">
+
+    <link type="text/css" rel="stylesheet" th:href="@{/webjars/bootstrap/css/bootstrap.min.css}">
+    <link type="text/css" rel="stylesheet" th:href="@{/fontawesome/all.css}">
+    <script type="text/javascript" th:src="@{/webjars/bootstrap/js/bootstrap.min.js}"></script>
+    <script type="text/javascript" th:src="@{/webjars/jquery/jquery.min.js}"></script>
+    <script th:src="@{/vendor/bootstrap/js/bootstrap.bundle.min.js}"></script>
+    <title>Voting Panel</title>
+</head>
+
+<body>
+
+<div class="bg-image"
+     style="background-image: url('https://mdbootstrap.com/img/Photos/Others/images/76.jpg');
+            height: 100vh">
+
+    <div class="container-fluid max-auto" style="width: 600px;">
+        <div th:if="${citizenNotFound}" class="alert alert-warning text-center">
+            <span>National ID entered is not correct! Contact supervisor for support.</span>
+        </div>
+        <div th:if="${printsNotMatch}" class="alert alert-warning text-center">
+            <span>Fingerprint Not Match, try again! If it persists, contact the supervisor!</span>
+        </div>
+        <div th:if="${voteSucceed}" class="alert alert-success text-center">
+            <span>Citizen [[${nid}]] has successfully Voted! </span>
+        </div>
+        <div th:if="${alreadyVoted}" class="alert alert-success text-center">
+            <span>Citizen [[${nid}]] has ALREADY VOTED! </span>
+        </div>
+        <div>
+            <h2 class="text-center">Welcome to Biometric Voting System</h2>
+            <p class="text-center text-secondary">Enter Your National ID to Start Voting</p>
+        </div>
+
+        <div class="mb-3">
+            <form th:action="@{/votes/find-citizen}" method="post" class="justify-content-center">
+                <input type="text" class="form-control-lg text-center" name="nid" id="nid" placeholder="Enter National ID Here" required>
+                <br><br>
+<!--                <a class="btn btn-primary text-center" href="#">Start Voting Now</a>-->
+                <input type="submit" class="btn btn-primary" id="startVoteBtn" value="Start Voting Now">
+            </form>
+        </div>
+
+        <div th:if="${foundCitizen != null}" class="border border-dark rounded text-center">
+            <div class="m-1">
+                <span class="text-white">Photo:</span>
+                <span th:if="${foundCitizen?.photo == null}" class="fas fa-portrait fa-3x icon-silver"></span>
+                <img class="img-fluid rounded" th:unless="${foundCitizen?.photo == null}" th:src="@{${foundCitizen?.photoImagePath}}" width="50">
+            </div>
+            <div class="m-1">
+                <span class="text-white">National ID: [[${foundCitizen?.nid}]]</span> &nbsp;
+            </div>
+            <div class="m-1">
+                <span class="text-white">Firstname: [[${foundCitizen?.firstname}]]</span> &nbsp;
+            </div>
+            <div class="m-1">
+                <span class="text-white">Firstname: [[${foundCitizen?.lastname}]]</span> &nbsp;
+            </div>
+            <div class="m-1">
+                <span class="text-white">Date of Birth: [[${foundCitizen?.dob}]]</span> &nbsp;
+            </div>
+            <div class="m-1">
+                <span class="text-white">Firstname: [[${foundCitizen?.address}]]</span> &nbsp;
+            </div>
+            <div class="m-1">
+                <span class="text-white">Contact: [[${foundCitizen?.phone}]]</span> &nbsp;
+            </div>
+            <div class="m-1">
+                <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#staticBackdrop">
+                    Scan Fingerprint
+                </button>
+            </div>
+        </div>
+    </div>
+
+<!--    Modal Starts Here -->
+
+<!--    <div class="modal fade text-center" id="confirmInfoModal">-->
+<!--        <div class="modal-dialog modal-dialog-centered">-->
+<!--            <div class="modal-content">-->
+<!--                <div class="modal-header">-->
+<!--                    <h4 class="modal-title" id="confirmInfoModalTitle">Confirm Information</h4>-->
+<!--                    <button type="button" class="close" data-dismiss="modal">&times;</button>-->
+<!--                </div>-->
+
+<!--                <div class="modal-body">-->
+<!--                    <form class="form-inline">-->
+<!--                        <div class="row m-1">-->
+<!--                            <div class="col-4">-->
+<!--                                <label for="nid">National ID: </label>-->
+<!--                            </div>-->
+<!--                            <div class="col-8">-->
+<!--                                <input type="text" class="form-control" id="confirm_nid" name="nid" placeholder="National ID" />-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                        <div class="row m-1">-->
+<!--                            <div class="col-4">-->
+<!--                                <label for="f_id">Fingerprint ID: </label>-->
+<!--                            </div>-->
+<!--                            <div class="col-8">-->
+<!--                                <input type="text" class="form-control" id="f_id" name="f_id" placeholder="Fingerprint ID" />-->
+<!--                            </div>-->
+<!--                        </div>-->
+<!--                    </form>-->
+<!--                </div>-->
+
+<!--                <div class="modal-footer">-->
+<!--                    <a class="btn btn-success" href="" id="confirmBtn">Confirm</a>-->
+<!--                    <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
+
+    <!-- Modal -->
+    <div class="modal fade" id="staticBackdrop" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content">
+                <form th:action="@{/votes/print/find-citizen}" method="post">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="staticBackdropLabel">Scan Finger</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <input type="hidden" th:value="${foundCitizen?.nid}" name="nid">
+                        <div class="mb-3">
+                            <label for="f_id" class="form-label">Finger Print</label>
+                            <input type="text" class="form-control" name="f_id" id="f_id" aria-describedby="f_id_des" >
+                            <div id="f_id_des" class="form-text">Place your right thump on the fingerprint scanner.</div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        <input type="submit" class="btn btn-primary" value="Submit">
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+<!--    Modal Ends Here -->
+</div>
+
+<script th:inline="javascript">
+    var url = "http://192.168.1.78";
+    var f_id;
+
+    //$("#startVoteBtn").on("click", function(e){
+      //  e.preventDefault();
+        //$("#confirmInfoModal").modal();
+    //}
+
+    var citizen = [[${foundCitizen}]];
+    console.log(citizen.nid);
+    setInterval(() => {
+        //console.log(citizen);
+        if(citizen != null){
+            displayModal(citizen);
+            console.log("I GOT here");
+        }
+        console.log("I am here");
+    }, 5000);
+
+
+    function displayModal(data){
+        document.preventDefault();
+        console.log("I am TOO");
+        $("#confirmBtn").attr("href", "/bevms/votes/candidates")
+        $("#confirm_nid").val(data.nid);
+        $("#confirmInfoModalTitle").text("Confirm Info of citizen for NID " + nid);
+        $("#confirmInfoModal").modal();
+    }
+
+    function fetchData(){
+        fetch(url + "/data")
+        .then((result) => result.json())
+        .then((data) => displayData(data));
+    }
+
+    function displayData(data){
+        console.log(data);
+        console.log("Finger ID: ", data.finger);
+        f_id = data.finger;
+        document.getElementById("f_id").value = data.finger;
+    }
+
+    setInterval(() => {
+        fetchData();
+        }, 5000
+    );
+</script>
+</body>
+</html>

@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="_layout" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <title>Votes</title>
+  <style type="text/css">
+        .btnAdd {
+      text-align: right;
+      width: 99%;
+      margin: 10px 0;
+    }
+    </style>
+</head>
+
+<body id="page-top">
+<div layout:fragment="content">
+  <!-- Begin Page Content -->
+  <div class="container-fluid">
+    <div th:if="${message != null}" class="alert alert-success text-center">
+      [[${message}]]
+    </div>
+
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 th:if="${pollingCenter?.pollingCenterId != null}" class="m-0 font-weight-bold text-primary">
+          Edit Supervisor with Roll No [[${pollingCenter?.pollingCenterId}]]
+        </h6>
+        <h6 th:unless="${pollingCenter?.pollingCenterId != null}" class="m-0 font-weight-bold text-primary">Voting Form</h6>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/votes}" th:method="post">
+          <input th:if="${vote?.id}" type="hidden" class="form-control" name="id" th:value="${vote?.id}">
+
+          <div class="mb-3 row">
+            <label for="pollingCenterId" class="col-sm-2 col-form-label">Polling Center</label>
+            <div class="col-sm-10">
+              <select class="dropdown-toggle form-control" name="pollingCenterId" id="pollingCenterId">
+                <option th:value="null">--SELECT--</option>
+                <option th:each="pollingCenter : ${pollingCenters}"
+                        th:text="${pollingCenter?.pollingCenterId} + ' - ' + ${pollingCenter.location}"
+                        th:value="${pollingCenter?.pollingCenterId}"
+                        th:selected="${pollingCenter?.pollingCenterId} == ${vote?.pollingCenterId}">DEFAULT</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="voterNid" class="col-sm-2 col-form-label">Voter</label>
+            <div class="col-sm-10">
+              <select class="dropdown-toggle form-control" name="voterNid" id="voterNid">
+                <option th:value="null">--SELECT--</option>
+                <option th:each="citizen : ${citizens}"
+                        th:text="${citizen?.nid} + ' - ' + ${citizen.lastname}"
+                        th:value="${citizen?.nid}"
+                        th:selected="${citizen?.nid} == ${vote?.voterNid}">DEFAULT</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="candidateId" class="col-sm-2 col-form-label">Candidate</label>
+            <div class="col-sm-10">
+              <select class="dropdown-toggle form-control" name="candidateId" id="candidateId">
+                <option th:value="null">--SELECT--</option>
+                <option th:each="candidate : ${candidates}"
+                        th:text="${candidate?.candidateId} + ' - ' + ${candidate.fullName}"
+                        th:value="${candidate?.candidateId}"
+                        th:selected="${candidate?.candidateId} == ${vote?.candidateId}">DEFAULT</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <div class="col-sm-10">
+              <input type="submit" class="btn btn-primary" value="Submit">
+              <input type="button" id="cancelBtn" class="btn btn-warning" value="Cancel">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    $(document).ready(function(){
+<!--      console.log("hello world");-->
+      $("#cancelBtn").on("click", function(){
+        alert("Hey");
+        console.log(window.location);
+        history.back();
+<!--        window.location.assign("http://localhost:8282/bevm/supervisors");-->
+      });
+    });
+  </script>
+
+  <!-- /.container-fluid -->
+</div>
+</body>
+
+</html>

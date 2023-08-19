@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="_layout" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <title>Polling Center</title>
+  <style type="text/css">
+        .btnAdd {
+      text-align: right;
+      width: 99%;
+      margin: 10px 0;
+    }
+    </style>
+</head>
+
+<body id="page-top">
+<div layout:fragment="content">
+  <!-- Begin Page Content -->
+  <div class="container-fluid">
+    <div th:if="${message != null}" class="alert alert-success text-center">
+      [[${message}]]
+    </div>
+
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 th:if="${pollingCenter?.pollingCenterId != null}" class="m-0 font-weight-bold text-primary">
+          Edit Supervisor with Roll No [[${pollingCenter?.pollingCenterId}]]
+        </h6>
+        <h6 th:unless="${pollingCenter?.pollingCenterId != null}" class="m-0 font-weight-bold text-primary">Polling Center Form</h6>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/polling-centers}" th:method="post">
+          <input th:if="${pollingCenter?.pollingCenterId}" type="hidden" class="form-control" name="pollingCenterId" th:value="${pollingCenter?.pollingCenterId}">
+          <div class="mb-3 row">
+            <label for="location" class="col-sm-2 col-form-label">Location</label>
+            <div class="col-sm-10">
+              <input type="text" class="form-control" id="location" name="location" placeholder="Location"
+                     th:value="${pollingCenter?.location ?: null}">
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <label for="supervisorRollNo" class="col-sm-2 col-form-label">Supervisor Rollno</label>
+            <div class="col-sm-10">
+              <select class="dropdown-toggle form-control" name="supervisorRollNo" id="supervisorRollNo">
+                <option th:value="null">--SELECT--</option>
+                <option th:each="supervisor : ${supervisors}"
+                        th:text="${supervisor?.rollNo} + ' - ' + ${supervisor.nid}"
+                        th:value="${supervisor?.rollNo}"
+                        th:selected="${supervisor?.rollNo} == ${pollingCenter?.supervisorRollNo}">DEFAULT</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="description" class="col-sm-2 col-form-label">Description</label>
+            <div class="col-sm-10">
+              <textarea type="text" class="form-control" id="description" name="description" placeholder="Brief Description"
+                        th:text="${pollingCenter?.description ?: null}"></textarea>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <div class="col-sm-10">
+              <input type="submit" class="btn btn-primary" value="Submit">
+              <input type="button" id="cancelBtn" class="btn btn-warning" value="Cancel">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    $(document).ready(function(){
+<!--      console.log("hello world");-->
+      $("#cancelBtn").on("click", function(){
+<!--        alert("Hey");-->
+        console.log(window.location);
+        history.back();
+<!--        window.location.assign("http://localhost:8282/bevm/supervisors");-->
+      });
+    });
+  </script>
+
+  <!-- /.container-fluid -->
+</div>
+</body>
+
+</html>

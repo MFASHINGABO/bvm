@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="_layout" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+  <title>BEVM</title>
+  <style type="text/css">
+        .btnAdd {
+      text-align: right;
+      width: 99%;
+      margin: 10px 0;
+    }
+    </style>
+</head>
+
+<body id="page-top">
+<div layout:fragment="content">
+  <!-- Begin Page Content -->
+  <div class="container-fluid">
+    <div th:if="${message != null}" class="alert alert-success text-center">
+      [[${message}]]
+    </div>
+
+    <div class="card shadow mb-4">
+      <div class="card-header py-3">
+        <h6 th:if="${bevm?.bevmId != null}" class="m-0 font-weight-bold text-primary">
+          Edit Device with ID [[${bevm?.bevmId}]]
+        </h6>
+        <h6 th:unless="${bevm?.bevmId != null}" class="m-0 font-weight-bold text-primary">BEVM(Device) Form</h6>
+      </div>
+      <div class="card-body">
+        <form th:action="@{/devices}" th:method="post" th:object="${bevm}">
+          <input th:if="${bevm?.bevmId}" type="hidden" class="form-control" name="bevmId" th:value="${bevm?.bevmId}">
+
+          <div class="mb-3 row">
+            <label for="pollingCenterId" class="col-sm-2 col-form-label">Polling Center</label>
+            <div class="col-sm-10">
+              <select class="dropdown-toggle form-control" name="pollingCenterId" id="pollingCenterId">
+                <option th:value="null">--SELECT--</option>
+                <option th:each="pollingCenter : ${pollingCenters}"
+                        th:text="${pollingCenter?.pollingCenterId} + ' - ' + ${pollingCenter?.location}"
+                        th:value="${pollingCenter?.pollingCenterId}"
+                        th:selected="${pollingCenter?.pollingCenterId} == ${bevm?.pollingCenterId}">DEFAULT</option>
+              </select>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="capacity" class="col-sm-2 col-form-label">Capacity</label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" id="capacity" name="capacity" placeholder="1-300" required
+                     th:value="${bevm?.capacity ?: null}">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="securityLevel" class="col-sm-2 col-form-label">Security Level</label>
+            <div class="col-sm-10">
+              <input type="number" class="form-control" id="securityLevel" name="securityLevel" placeholder="1-5" maxlength="5" minlength="9" required
+                     th:value="${bevm?.securityLevel ?: null}">
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="description" class="col-sm-2 col-form-label">Description</label>
+            <div class="col-sm-10">
+              <textarea type="text" class="form-control" id="description" name="description" placeholder="Brief Description" required
+                        th:text="${bevm?.description ?: null}"></textarea>
+            </div>
+          </div>
+          <div class="mb-3 row">
+            <label for="active" class="col-sm-2 col-form-label">Device Status</label>
+            <div class="col-sm-10">
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="active" th:value="1" th:field="*{active}" id="active">
+                <label class="form-check-label" for="active">
+                  Active
+                </label>
+              </div>
+              <div class="form-check">
+                <input class="form-check-input" type="radio" name="active" id="inactive" th:field="*{active}" th:value="0">
+                <label class="form-check-label" for="inactive">
+                  Inactive
+                </label>
+              </div>
+            </div>
+          </div>
+
+          <div class="mb-3 row">
+            <div class="col-sm-10">
+              <input type="submit" class="btn btn-primary" value="Submit">
+              <input type="button" id="cancelBtn" class="btn btn-warning" value="Cancel">
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    $(document).ready(function(){
+<!--      console.log("hello world");-->
+      $("#cancelBtn").on("click", function(){
+        alert("Hey");
+        console.log(window.location);
+        history.back();
+<!--        window.location.assign("http://localhost:8282/bevm/supervisors");-->
+      });
+    });
+  </script>
+
+  <!-- /.container-fluid -->
+</div>
+</body>
+
+</html>

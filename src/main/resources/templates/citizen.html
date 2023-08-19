@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout" layout:decorate="_layout" xmlns:th="http://www.w3.org/1999/xhtml">
+
+<head>
+<!--    <script th:src="@{/js/popper.min.js}"></script>-->
+    <script type="text/javascript" th:src="@{/webjars/popper.js/umd/popper.min.js}"></script>
+    <title>Citizens</title>
+    <style type="text/css">
+        .btnAdd {
+      text-align: right;
+      width: 99%;
+      margin: 10px 0;
+    }
+    </style>
+</head>
+
+<body id="page-top">
+    <div layout:fragment="content">
+        <!-- Begin Page Content -->
+        <div class="container-fluid">
+
+            <div th:if="${message != null}" class="alert alert-success text-center">
+                [[${message}]]
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Citizens</h6>
+                </div>
+                <div class="card-body">
+                    <div class="btnAdd">
+                        <a th:href="@{/citizens/add}" class="btn btn-success btn-sm">Add Citizen</a>
+                    </div>
+                    <table id="example" class="table table-striped table-bordered" style="width:100%">
+                        <thead>
+                        <tr>
+                            <th>NID</th>
+                            <th>Photos</th>
+                            <th>Firstname</th>
+                            <th>Lastname</th>
+                            <th>Phone</th>
+                            <th>Options</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="citizen : ${citizens}">
+                            <td>[[${citizen.nid}]]</td>
+                            <td>
+                                <span th:if="${citizen.photo == null}" class="fas fa-portrait fa-3x icon-silver"></span>
+                                <img class="img-fluid rounded" th:unless="${citizen.photo == null}" th:src="@{${citizen.photoImagePath}}" width="50">
+                            </td>
+                            <td>[[${citizen.firstname}]]</td>
+                            <td>[[${citizen.lastname}]]</td>
+                            <td>[[${citizen.phone}]]</td>
+                            <td>
+                                <a th:href="@{'/citizens/edit/' + ${citizen.nid}}" class="btn btn-info btn-sm editbtn" title="Edit this Record">Edit</a>
+                                <a type="button" data-toggle="modal" data-target="#confirmDelete"
+                                        th:href="@{'/citizens/delete/' + ${citizen.nid}}"
+                                        title="Delete this Citizen"
+                                        class="link-delete btn btn-danger btn-sm deleteBtn"
+                                        th:nid = "${citizen.nid}">
+                                    Delete
+                                </a>
+                                <a type="button" data-toggle="modal" data-target="#enrolFingerModal"
+                                        title="Enroll Fingerprint for this citizen"
+                                        th:href="@{'/enroll-finger/' + ${citizen.nid}}"
+                                        class="btn btn-info btn-sm enrollBtn"
+                                        th:nid = "${citizen.nid}">
+                                    Enroll Finger
+                                </a>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+        </div>
+        <!-- /.container-fluid -->
+
+<!--        Modals Start -->
+        <div class="modal fade text-center" id="confirmDelete">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="modalTitle">Delete Confirmation</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+                        <span id="modalBody"></span>
+                    </div>
+
+                    <div class="modal-footer">
+                        <a class="btn btn-success" href="" id="yesButton">Yes</a>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger">No</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade text-center" id="enrolFingerModal">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 class="modal-title" id="enrollFingerModalTitle">Enroll Finger Print</h4>
+                        <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    </div>
+
+                    <div class="modal-body">
+<!--                        <span id="enrollFingerModalBody"></span>-->
+                        <form class="form-inline">
+<!--                            <span>National ID: </span> &nbsp;-->
+<!--                            <input type="text" class="form-control" id="nid" name="nid" placeholder="National ID" />-->
+                            <div class="row m-1">
+                                <div class="col-4">
+                                    <label for="nid">National ID: </label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" id="nid" name="nid" placeholder="National ID" />
+                                </div>
+                            </div>
+                            <div class="row m-1">
+                                <div class="col-4">
+                                    <label for="f_id">Fingerprint ID: </label>
+                                </div>
+                                <div class="col-8">
+                                    <input type="text" class="form-control" id="f_id" name="f_id" placeholder="Fingerprint ID" />
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <div class="modal-footer">
+                        <a class="btn btn-success" href="" id="updateBtn">Update</a>
+                        <button type="button" data-dismiss="modal" class="btn btn-danger">Cancel</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+<!--        Modals Ends -->
+
+<!--        Java Script Starts     -->
+        <script th:inline="javascript">
+            var url = "http://192.168.1.78";
+            var f_id;
+
+            $(document).ready(function(){
+                $(".link-delete").on("click", function(e){
+                    e.preventDefault();
+                    link = $(this);
+                    //alert($(this).attr("href"));
+                    nid = link.attr("nid");
+                    $("#yesButton").attr("href", link.attr("href"))
+                    $("#modalBody").text("Are you sure you want to Delete this Candidate NID " + nid + "?");
+                    $("#confirmDelete").modal();
+                });
+            });
+
+            $(document).ready(function(){
+                $(".enrollBtn").on("click", function(e){
+                    //e.preventDefault();
+                    link = $(this);
+                    var url = link.attr("href");
+                    url = url + "?f_id=" + f_id;
+                    alert(url);
+                    nid = link.attr("nid");
+                    $("#updateBtn").attr("href", url)
+                    $("#nid").val(nid);
+                    $("#enrollFingerModalBody").text("Enrolling finger print for NID " + nid);
+                    $("#enrollFingerModalTitle").text("Enroll Fingerprint for NID " + nid);
+                    $("#enrolFingerModal").modal();
+                });
+            });
+
+            function fetchData(){
+                fetch(url + "/data")
+                .then((result) => result.json())
+                .then((data) => displayData(data));
+            }
+
+            function displayData(data){
+                console.log(data);
+                console.log("Finger ID: ", data.finger);
+                f_id = data.finger;
+                document.getElementById("f_id").value = data.finger;
+            }
+
+            setInterval(() => {
+                    fetchData();
+                }, 5000
+            );
+	    </script>
+<!--        Java Script Ends     -->
+    </div>
+</body>
+
+</html>
